@@ -63,3 +63,26 @@ def predict_video(video_folder, model, device):
     return label, avg_prob_real
 
     
+
+import argparse
+from model import get_model
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Predict deepfake detection on video")
+    parser.add_argument("--video_path", type=str, required=True, help="Path to the input video file")
+    parser.add_argument("--model_path", type=str, required=True, help="Path to the trained model file")
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to run inference")
+
+    args = parser.parse_args()
+
+    # Load model
+    model = get_model()
+    model.load_state_dict(torch.load(args.model_path, map_location=args.device))
+    model.to(args.device)
+
+    # Extract faces & predict
+    extracted_faces_folder = "temp_faces"
+    extract_faces(args.video_path, extracted_faces_folder)
+    label, confidence = predict_frames(extracted_faces_folder, model, args.device)
+
+    print(f"Predicted: {'REAL' if label == 1 else 'FAKE'} with confidence: {confidence:.4f}")

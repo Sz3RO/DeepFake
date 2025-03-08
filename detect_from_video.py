@@ -3,6 +3,8 @@ import cv2
 import torch
 from facenet_pytorch import MTCNN
 from tqdm import tqdm
+import argparse
+
 
 def extract_faces(video_path, output_folder, confidence_threshold=0.9):
     os.makedirs(output_folder, exist_ok=True)
@@ -50,3 +52,14 @@ def extract_faces(video_path, output_folder, confidence_threshold=0.9):
     
     cap.release()
     return frames_data
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Extract faces from a video")
+    parser.add_argument("--video_path", type=str, required=True, help="Path to the input video file")
+    parser.add_argument("--output_folder", type=str, required=True, help="Folder to save extracted faces")
+    parser.add_argument("--confidence_threshold", type=float, default=0.9, help="Confidence threshold for face detection")
+
+    args = parser.parse_args()
+
+    extract_faces(args.video_path, args.output_folder, args.confidence_threshold)

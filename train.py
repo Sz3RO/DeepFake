@@ -113,3 +113,31 @@ def evaluate(model, test_loader, device):
     
 
     return acc, precision, recall, f1
+
+import argparse
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train deepfake detection model")
+    parser.add_argument("--epochs", type=int, required=True, help="Number of training epochs")
+    parser.add_argument("--lr", type=float, required=True, help="Learning rate")
+    parser.add_argument("--device", type=str, required=True, choices=["cpu", "cuda"], help="Device to train on")
+    parser.add_argument("--save_path", type=str, default="best_model.pth", help="Path to save the best model")
+
+    args = parser.parse_args()
+
+    # Load model và dữ liệu (cần đảm bảo bạn đã có model và dataloader)
+    from model import get_model
+    from load_data import LoadData
+    from torch.utils.data import DataLoader
+
+    # Khởi tạo mô hình
+    model = get_model()
+
+    # Load dữ liệu
+    train_dataset = LoadData(root_dir="data/train")
+    val_dataset = LoadData(root_dir="data/val")
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+
+    # Gọi hàm train
+    train(model, train_loader, val_loader, args.epochs, args.lr, args.device, args.save_path)
